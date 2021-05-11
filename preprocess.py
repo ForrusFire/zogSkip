@@ -3,8 +3,8 @@ import pickle
 import music21 as m21
 
 
-PATH_TO_CLASSICAL_MIDI = "data/raw_midi/classical_midi"
-PATH_TO_SAVE_NOTES = "data/preprocessed/notes"
+PATH_TO_MIDI = "data/raw_midi/classical_midi"
+PATH_TO_SAVE_NOTES = "data/preprocessed/classical_notes"
 
 
 def preprocess(dataset_path, save_path):
@@ -19,8 +19,9 @@ def preprocess(dataset_path, save_path):
     print("Finished parsing")
 
     # Save parsed notes
-    print("Saving parsed notes")
+    print("Saving parsed notes...")
     save_notes(notes, save_path)
+    print("Finished preprocessing")
     
     
 def load_songs(dataset_path):
@@ -68,4 +69,4 @@ def save_notes(notes, save_path):
 
 
 if __name__ == "__main__":
-    preprocess(PATH_TO_CLASSICAL_MIDI, PATH_TO_SAVE_NOTES)
+    preprocess(PATH_TO_MIDI, PATH_TO_SAVE_NOTES)
