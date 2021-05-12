@@ -52,11 +52,11 @@ def parse_songs(songs):
         # Parse each element
         for element in notes_to_parse:
             if isinstance(element, m21.note.Note):
-                notes.append(str(element.pitch))
+                notes.append(str(element.pitch) + " " + str(element.quarterLength))
             elif isinstance(element, m21.chord.Chord):
-                notes.append('.'.join(str(n) for n in element.normalOrder))
+                notes.append('.'.join(str(n) for n in element.normalOrder) + " " + str(element.quarterLength))
             elif isinstance(element, m21.note.Rest):
-                notes.append(element.name)
+                notes.append(str(element.name) + " " + str(element.quarterLength))
 
     return notes
 
