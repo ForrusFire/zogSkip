@@ -8,7 +8,7 @@ from torch.utils.data.dataset import random_split
 
 class NotesDataset(Dataset):
     def __init__(self, notes_path, sequence_length):
-        self.input, self.output = prepare_sequences(notes_path, sequence_length)
+        self.input, self.output, self.num_classes = prepare_sequences(notes_path, sequence_length)
 
     def __getitem__(self, index):
         return (self.input[index], self.output[index])
@@ -16,9 +16,13 @@ class NotesDataset(Dataset):
     def __len__(self):
         return len(self.input)
 
+    def get_num_classes(self):
+        return self.num_classes
+
 
 def prepare_sequences(notes_path, sequence_length):
     notes = load_notes(notes_path)
+    num_unique_notes = len(set(notes))
 
     # Create a dictionary that maps notes to ints
     note_to_int = create_note_to_int_dict(notes)
@@ -36,13 +40,13 @@ def prepare_sequences(notes_path, sequence_length):
         network_output.append(note_to_int[output_sequence])
 
     # Normalize input
-    network_input = normalize(network_input, len(set(notes)))
+    network_input = normalize(network_input, num_unique_notes)
 
     # Convert lists into PyTorch tensors
-    network_input = torch.FloatTensor(network_input)
-    network_output = torch.FloatTensor(network_output)
+    network_input = torch.unsqueeze(torch.FloatTensor(network_input), 2)
+    network_output = torch.LongTensor(network_output)
 
-    return (network_input, network_output)
+    return (network_input, network_output, num_unique_notes)
 
 
 def load_notes(notes_path):
