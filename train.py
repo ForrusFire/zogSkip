@@ -20,6 +20,9 @@ train_batchsize = 64
 val_batchsize = 64
 
 ## Model
+LSTM1_num_units = 512
+SeqSelfAttention_num_units = 32
+LSTM2_num_units = 512
 dropout_prob = 0.3
 
 ## Training
@@ -39,12 +42,13 @@ def load_dataset(notes_path, sequence_length):
     print("Loading dataset...")
     # Create custom dataset
     dataset = NotesDataset(notes_path, sequence_length)
+    num_classes = dataset.get_num_classes()
 
     # Split into training and val sets, and load them into data loaders
     train_loader, val_loader = split_and_load_dataset(dataset, train_val_split_percentage, train_batchsize, val_batchsize)
     print("Dataset loaded")
 
-    return (train_loader, val_loader)
+    return (train_loader, val_loader, num_classes)
 
 
 def train_model(model, loss_fn, optimizer, train_loader, val_loader, num_epochs):
@@ -119,22 +123,27 @@ def make_train_step(model, loss_fn, optimizer):
 
 
 def save_model(model):
-    # Saves the model
+    # (TODO) Saves the model
     pass
 
 
 def save_losses(train_losses, val_losses):
-    # Saves the losses
+    # (TODO) Saves the losses
     pass
 
 
 
 if __name__ == "__main__":
-    train_loader, val_loader = load_dataset(PATH_TO_NOTES, sequence_length)
+    train_loader, val_loader, num_classes = load_dataset(PATH_TO_NOTES, sequence_length)
 
     # Create model
     model = Model(
-        
+        LSTM1_num_units,
+        SeqSelfAttention_num_units,
+        LSTM2_num_units,
+        dropout_prob,
+        sequence_length,
+        num_classes
     ).to(DEVICE)
 
     # Create loss function and optimizer
