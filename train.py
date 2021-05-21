@@ -8,6 +8,8 @@ from dataset import NotesDataset, split_and_load_dataset
 
 
 PATH_TO_NOTES = "data/preprocessed/classical_notes"
+PATH_TO_SAVE_WEIGHTS = "weights/model_weights.pth"
+PATH_TO_SAVE_LOSSES = "losses/loss.txt"
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
@@ -62,7 +64,7 @@ def train_model(model, loss_fn, optimizer, train_loader, val_loader, num_epochs)
     print("Training...")
     train_step = make_train_step(model, loss_fn, optimizer)
 
-    for _ in range(num_epochs):
+    for i in range(num_epochs):
         batch_losses = []
 
         # Iterate through each batch for training
@@ -97,6 +99,9 @@ def train_model(model, loss_fn, optimizer, train_loader, val_loader, num_epochs)
             val_loss = np.mean(batch_losses)
             val_losses.append(val_loss)
 
+        # Display progress
+        print(f"{i+1} of {num_epochs} epochs trained...")
+
     print("Completed training")
     print("Trained model:")
     print(model.state_dict())
@@ -111,7 +116,7 @@ def make_train_step(model, loss_fn, optimizer):
         model.train() # Sets model in training mode
 
         yhat = model(x)
-        loss = loss_fn(y, yhat)
+        loss = loss_fn(yhat, y)
         loss.backward()
 
         optimizer.step()
@@ -122,14 +127,21 @@ def make_train_step(model, loss_fn, optimizer):
     return train_step
 
 
-def save_model(model):
-    # (TODO) Saves the model
-    pass
+def save_model(model, save_path):
+    # Saves the model
+    print("Saving model...")
+    torch.save(model.state_dict(), save_path)
+    print("Model saved")
 
 
-def save_losses(train_losses, val_losses):
-    # (TODO) Saves the losses
-    pass
+def save_losses(train_losses, val_losses, save_path):
+    # Saves the losses
+    losses = [train_losses, val_losses]
+
+    print("Saving losses...")
+    with open(save_path, 'w') as file:
+        file.write(str(losses))
+    print("Losses saved")
 
 
 
@@ -154,7 +166,7 @@ if __name__ == "__main__":
     train_losses, val_losses = train_model(model, loss_fn, optimizer, train_loader, val_loader, num_epochs)
 
     # Save model and losses
-    save_model(model)
-    save_losses(train_losses, val_losses)
+    save_model(model, PATH_TO_SAVE_WEIGHTS)
+    save_losses(train_losses, val_losses, PATH_TO_SAVE_LOSSES)
 
-    print(val_losses, train_losses)
+    print("Training complete!")

@@ -15,10 +15,10 @@ class Model(nn.Module):
         self.Linear = nn.Linear(LSTM2_num_units * sequence_length, output_length)
 
     def forward(self, x):
-        x = self.LSTM1(x)
+        x, _ = self.LSTM1(x)
         x = self.SeqSelfAttention(x)
         x = self.Dropout(x)
-        x = self.LSTM2(x)
+        x, _ = self.LSTM2(x)
         x = self.Dropout(x)
         x = self.Linear(torch.flatten(x, start_dim=1))
         return x
@@ -78,7 +78,7 @@ class SeqSelfAttention(nn.Module):
         e = self.calculate_emission(x)
 
         # Apply attention activation (sigmoid) to emission
-        e = F.sigmoid(e)
+        e = torch.sigmoid(e)
 
         # a_{t} = \text{softmax}(e_t)
         a = F.softmax(e, dim=-1)
@@ -88,16 +88,13 @@ class SeqSelfAttention(nn.Module):
         return l
 
     def calculate_emission(self, x):
-        x_shape = x.size()
-        batch_size, seq_len = x_shape[0], x_shape[1]
-
         # h_{t, t'} = \tanh(x_t^T W_t + x_{t'}^T W_x + b_h)
         q = torch.unsqueeze(torch.tensordot(x, self.Wt, dims=1), 2)
         k = torch.unsqueeze(torch.tensordot(x, self.Wx, dims=1), 1)
-        h = F.tanh(q + k + self.bh)
+        h = torch.tanh(q + k + self.bh)
 
         # e_{t, t'} = W_a h_{t, t'} + b_a
-        e = torch.reshape(torch.tensordot(h, self.Wa, dims=1) + self.ba, (batch_size, seq_len, seq_len))
+        e = torch.squeeze(torch.tensordot(h, self.Wa, dims=1) + self.ba, dim=-1)
         return e
 
 
