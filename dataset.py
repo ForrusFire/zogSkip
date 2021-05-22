@@ -20,12 +20,13 @@ class NotesDataset(Dataset):
         return self.num_classes
 
 
-def prepare_sequences(notes_path, sequence_length):
+def prepare_sequences(notes_path, sequence_length, predict=False):
     notes = load_notes(notes_path)
     num_unique_notes = len(set(notes))
 
     # Create a dictionary that maps notes to ints
     note_to_int = create_note_to_int_dict(notes)
+    int_to_note = create_int_to_note_dict(notes)
 
     # Dataset input and output lists
     network_input = []
@@ -41,6 +42,10 @@ def prepare_sequences(notes_path, sequence_length):
 
     # Normalize input
     network_input = normalize(network_input, num_unique_notes)
+
+    # If called from predict.py, return from here
+    if predict:
+        return (int_to_note, network_input)
 
     # Convert lists into PyTorch tensors
     network_input = torch.unsqueeze(torch.FloatTensor(network_input), 2)
@@ -65,6 +70,16 @@ def create_note_to_int_dict(notes):
     note_to_int = dict((note, number) for number, note in enumerate(note_names))
 
     return note_to_int
+
+
+def create_int_to_note_dict(notes):
+    # Create sorted set of distinct note pitches and rests
+    note_names = sorted(set(note for note in notes))
+
+    # Create the dict
+    int_to_note = dict((number, note) for number, note in enumerate(note_names))
+
+    return int_to_note
 
 
 def normalize(sequence_list, range):
