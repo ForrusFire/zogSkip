@@ -54,7 +54,9 @@ def load_dataset(notes_path, sequence_length):
 
 
 def train_model(model, loss_fn, optimizer, train_loader, val_loader, num_epochs):
-    # Trains the model and returns the training and validation loss lists
+    """
+    Trains the model and returns the training and validation loss lists
+    """
     train_losses = []
     val_losses = []
 
@@ -92,7 +94,7 @@ def train_model(model, loss_fn, optimizer, train_loader, val_loader, num_epochs)
                 model.eval() # Sets model in prediction mode
                 yhat = model(x_val)
 
-                loss = loss_fn(y_val, yhat).item()
+                loss = loss_fn(yhat, y_val).item()
                 batch_losses.append(loss)
 
             # Add average loss to val losses list
@@ -110,7 +112,9 @@ def train_model(model, loss_fn, optimizer, train_loader, val_loader, num_epochs)
 
 
 def make_train_step(model, loss_fn, optimizer):
-    # Returns a function that performs the training step
+    """
+    Returns a function that performs the training step
+    """
     def train_step(x, y):
         # Performs a training step and returns the loss
         model.train() # Sets model in training mode
