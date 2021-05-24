@@ -4,13 +4,15 @@ import torch
 import music21 as m21
 
 import train as tn
-from model import Model
 from dataset import prepare_sequences
 
+Model = tn.Model
 
-PATH_TO_NOTES = "data/preprocessed/classical_notes"
-PATH_TO_WEIGHTS = "weights/model_weights.pth"
-PATH_TO_SAVE_MIDI = "predictions/predict.mid"
+
+PATH_TO_NOTES = tn.PATH_TO_NOTES
+PATH_TO_WEIGHTS = tn.PATH_TO_SAVE_WEIGHTS
+PATH_TO_SAVE_MIDI = "predictions/" + tn.MODEL_NAME + "_" + tn.DATASET + "_" + tn.PARAMETER_SET + "/predict"
+NUM_MIDI_FILES = 10
 NUM_GENERATED_NOTES = 500
 
 
@@ -18,17 +20,26 @@ def predict(notes_path, weights_path, save_path):
     """
     Generate a piano midi file using the trained model
     """
+    print("Predicting...")
     int_to_note, sequences_list = prepare_sequences(notes_path, tn.sequence_length, predict=True)
     
     # Loads the model
     num_classes = len(int_to_note)
     model = load_model(weights_path, num_classes)
 
-    # Creates the prediction and turns it into a midi file
-    notes = generate_notes(model, int_to_note, sequences_list)
-    midi = create_midi(notes)
+    for i in range(NUM_MIDI_FILES):
+        # Creates the prediction and turns it into a midi file
+        print("Generating notes...")
+        notes = generate_notes(model, int_to_note, sequences_list)
+        print("Creating midi...")
+        midi = create_midi(notes)
 
-    save_midi(midi, save_path)
+        print("Saving midi...")
+        full_save_path = save_path + f"_{i+1}.mid"
+        save_midi(midi, full_save_path)
+        print(f"{i+1} of {NUM_MIDI_FILES} midi files generated...")
+
+    print("Prediction complete!")
 
 
 def load_model(weights_path, num_classes):

@@ -1,15 +1,24 @@
+import importlib
+
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from model import Model
 from dataset import NotesDataset, split_and_load_dataset
 
 
-PATH_TO_NOTES = "data/preprocessed/classical_notes"
-PATH_TO_SAVE_WEIGHTS = "weights/model_weights.pth"
-PATH_TO_SAVE_LOSSES = "losses/loss.txt"
+MODEL_NAME = "LSTMAttLSTM"
+DATASET = "beethoven_mozart"
+PARAMETER_SET = "A"
+
+Model = getattr(importlib.import_module("models." + MODEL_NAME + ".model"), "Model")
+pm = getattr(importlib.import_module("models." + MODEL_NAME + ".parameters"), "parameters_" + PARAMETER_SET)
+
+
+PATH_TO_NOTES = "data/preprocessed/" + DATASET + "_notes"
+PATH_TO_SAVE_WEIGHTS = "models/" + MODEL_NAME + "/weights/weights_" + DATASET + "_" + PARAMETER_SET + ".pth"
+PATH_TO_SAVE_LOSSES = "models/" + MODEL_NAME + "/losses/loss_" + DATASET + "_" + PARAMETER_SET + ".txt"
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
@@ -22,20 +31,17 @@ train_batchsize = 64
 val_batchsize = 64
 
 ## Model
-LSTM1_num_units = 512
-SeqSelfAttention_num_units = 32
-LSTM2_num_units = 512
-dropout_prob = 0.3
+LSTM1_num_units = pm.LSTM1_num_units
+SeqSelfAttention_num_units = pm.SeqSelfAttention_num_units
+LSTM2_num_units = pm.LSTM2_num_units
+dropout_prob = pm.dropout_prob
 
 ## Training
-num_epochs = 200
+num_epochs = 100
 lr = 1e-3
 alpha = 0.9
 momentum = 0.0
 epsilon = 1e-7
-
-## Random Seed
-torch.random.manual_seed(42)
 
 ###################################
 
@@ -104,7 +110,6 @@ def train_model(model, loss_fn, optimizer, train_loader, val_loader, num_epochs)
         # Display progress
         print(f"{i+1} of {num_epochs} epochs trained...")
 
-    print("Completed training")
     print("Trained model:")
     print(model.state_dict())
 
