@@ -12,7 +12,7 @@ epochs = 100
 
 PATH_TO_NOTES = tn.PATH_TO_NOTES
 PATH_TO_WEIGHTS = tn.PATH_TO_SAVE_WEIGHTS + "_" + str(epochs) + "epochs.pth"
-PATH_TO_SAVE_MIDI = "predictions/" + tn.MODEL_NAME + "_" + tn.DATASET + "_" + tn.PARAMETER_SET + "/predict"
+PATH_TO_SAVE_MIDI = "predictions/" + tn.MODEL_NAME + "_" + tn.DATASET + "_" + tn.PARAMETER_SET + "_" + str(epochs) + "epochs" + "/predict"
 NUM_MIDI_FILES = 10
 NUM_GENERATED_NOTES = 500
 
