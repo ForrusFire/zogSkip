@@ -13,11 +13,11 @@ DATASET = "beethoven_mozart"
 PARAMETER_SET = "A"
 
 Model = getattr(importlib.import_module("models." + MODEL_NAME + ".model"), "Model")
-pm = getattr(importlib.import_module("models." + MODEL_NAME + ".parameters"), "parameters_" + PARAMETER_SET)
+pm = importlib.import_module("models." + MODEL_NAME + ".parameters" + ".parameters_" + PARAMETER_SET)
 
 
 PATH_TO_NOTES = "data/preprocessed/" + DATASET + "_notes"
-PATH_TO_SAVE_WEIGHTS = "models/" + MODEL_NAME + "/weights/weights_" + DATASET + "_" + PARAMETER_SET + ".pth"
+PATH_TO_SAVE_WEIGHTS = "models/" + MODEL_NAME + "/weights/weights_" + DATASET + "_" + PARAMETER_SET
 PATH_TO_SAVE_LOSSES = "models/" + MODEL_NAME + "/losses/loss_" + DATASET + "_" + PARAMETER_SET + ".txt"
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -110,6 +110,11 @@ def train_model(model, loss_fn, optimizer, train_loader, val_loader, num_epochs)
         # Display progress
         print(f"{i+1} of {num_epochs} epochs trained...")
 
+        # Save model every 25 epochs
+        if (i+1 % 25 == 0):
+            save_model(model, PATH_TO_SAVE_WEIGHTS, i+1)
+
+
     print("Trained model:")
     print(model.state_dict())
 
@@ -136,10 +141,10 @@ def make_train_step(model, loss_fn, optimizer):
     return train_step
 
 
-def save_model(model, save_path):
+def save_model(model, save_path, epoch):
     # Saves the model
     print("Saving model...")
-    torch.save(model.state_dict(), save_path)
+    torch.save(model.state_dict(), save_path + "_" + str(epoch) + "epochs.pth")
     print("Model saved")
 
 
@@ -175,7 +180,7 @@ if __name__ == "__main__":
     train_losses, val_losses = train_model(model, loss_fn, optimizer, train_loader, val_loader, num_epochs)
 
     # Save model and losses
-    save_model(model, PATH_TO_SAVE_WEIGHTS)
+    save_model(model, PATH_TO_SAVE_WEIGHTS, num_epochs)
     save_losses(train_losses, val_losses, PATH_TO_SAVE_LOSSES)
 
     print("Training complete!")

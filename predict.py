@@ -7,10 +7,11 @@ import train as tn
 from dataset import prepare_sequences
 
 Model = tn.Model
+epochs = 100
 
 
 PATH_TO_NOTES = tn.PATH_TO_NOTES
-PATH_TO_WEIGHTS = tn.PATH_TO_SAVE_WEIGHTS
+PATH_TO_WEIGHTS = tn.PATH_TO_SAVE_WEIGHTS + "_" + str(epochs) + "epochs.pth"
 PATH_TO_SAVE_MIDI = "predictions/" + tn.MODEL_NAME + "_" + tn.DATASET + "_" + tn.PARAMETER_SET + "/predict"
 NUM_MIDI_FILES = 10
 NUM_GENERATED_NOTES = 500
