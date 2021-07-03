@@ -110,8 +110,8 @@ def train_model(model, loss_fn, optimizer, train_loader, val_loader, num_epochs)
         # Display progress
         print(f"{i+1} of {num_epochs} epochs trained...")
 
-        # Save model every 25 epochs
-        if (i+1 % 25 == 0):
+        # Save model every 20 epochs
+        if i+1 % 20 == 0:
             save_model(model, PATH_TO_SAVE_WEIGHTS, i+1)
 
 
